@@ -1,0 +1,22 @@
+--- lib/galactrum_config.py
++++ lib/galactrum_config.py.new
+@@ -28,7 +28,7 @@
+     @classmethod
+     def get_rpc_creds(self, data, network='mainnet'):
+         # get rpc info from galactrum.conf
+-        match = re.findall(r'rpc(user|password|port)=(.*?)$', data, re.MULTILINE)
++        match = re.findall(r'rpc(connect|user|password|port)=(.*?)$', data, re.MULTILINE)
+
+         # python >= 2.7
+         creds = {key: value for (key, value) in match}
+@@ -42,6 +42,10 @@
+
+         # convert to an int if taken from galactrum.conf
+         creds[u'port'] = int(creds[u'port'])
++
++        # set the host from config file
++        if ('connect' in creds):
++            creds[u'host'] = creds[u'connect']
+
+         # return a dictionary with RPC credential key, value pairs
+         return creds

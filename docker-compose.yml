@@ -1,0 +1,48 @@
+version: "3.1"
+
+services:
+  daemon:
+    build: "1.1"
+    deploy:
+      replicas: 1
+    environment:
+      - EXTERNAL_IP
+      - MASTERNODE
+    image: hub.ackro.net/galactrum:latest
+    ports:
+      - "6270:6270"
+    restart: unless-stopped
+    stop_grace_period: 30s
+    networks:
+      private:
+    secrets:
+      - masternode-privkey
+    volumes:
+      - config:/etc/galactrum
+      - data:/home/galactrum
+
+  sentinel:
+    build: sentinel
+    depends_on:
+      - daemon
+    deploy:
+      replicas: 1
+      image: hub.ackro.net/galactrum:sentinal-alpine
+    restart: unless-stopped
+    networks:
+      private:
+    volumes:
+      - config:/etc/galactrum:ro
+      - sentinel:/opt/sentinel/database
+
+networks:
+  private:
+
+secrets:
+  masternode-privkey:
+    file: masternode.txt
+
+volumes:
+  config:
+  data:
+  sentinel:
